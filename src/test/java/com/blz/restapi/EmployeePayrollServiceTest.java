@@ -17,7 +17,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 public class EmployeePayrollServiceTest {
-	
+
 	private static final IOService REST_IO = null;
 	static EmployeePayrollService employeePayrollRESTService;
 
@@ -65,6 +65,27 @@ public class EmployeePayrollServiceTest {
 
 		employeePayrollData = new Gson().fromJson(response.asString(), EmployeePayrollData.class);
 		employeePayrollRESTService.addEmployeeToPayroll(employeePayrollData, REST_IO);
+		long entries = employeePayrollRESTService.countEntries(REST_IO);
+		Assert.assertEquals(1, entries);
+	}
+
+	@Test
+	public void givenMultipleEmployee_WhenAdded_ShouldMatch201ResponseAndCount() {
+		EmployeePayrollData[] arrayOfEmployee = getEmployeeList();
+		employeePayrollRESTService = new EmployeePayrollService(Arrays.asList(arrayOfEmployee));
+		EmployeePayrollData[] arrayOfEmployeePayroll = {
+				new EmployeePayrollData(0, "Abhi", "M", 3000000.00, LocalDate.now()),
+				new EmployeePayrollData(0, "Latha", "F", 5000000.00, LocalDate.now()) };
+
+		for (EmployeePayrollData employeePayrollData : arrayOfEmployeePayroll) {
+
+			Response response = addEmployeeToJsonServer(employeePayrollData);
+			int statusCode = response.getStatusCode();
+			Assert.assertEquals(201, statusCode);
+
+			employeePayrollData = new Gson().fromJson(response.asString(), EmployeePayrollData.class);
+			employeePayrollRESTService.addEmployeeToPayroll(employeePayrollData, REST_IO);
+		}
 		long entries = employeePayrollRESTService.countEntries(REST_IO);
 		Assert.assertEquals(3, entries);
 	}
