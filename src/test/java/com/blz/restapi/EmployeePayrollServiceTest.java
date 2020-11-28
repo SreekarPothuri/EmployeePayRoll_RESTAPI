@@ -105,7 +105,7 @@ public class EmployeePayrollServiceTest {
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(200, statusCode);
 	}
-	
+
 	@Test
 	public void givenEmployeeDataFromJsonServer_WhenRetrieved_ShouldMatchEntries() {
 		EmployeePayrollData[] arrayOfEmployee = getEmployeeList();
@@ -113,5 +113,21 @@ public class EmployeePayrollServiceTest {
 		employeePayrollRESTService = new EmployeePayrollService(Arrays.asList(arrayOfEmployee));
 		long entries = employeePayrollRESTService.countEntries(REST_IO);
 		Assert.assertEquals(5, entries);
+	}
+
+	@Test
+	public void givenEmployeeDetails_WhenDeleted_ShouldMatch200ResponseAndCount() {
+		EmployeePayrollData[] arrayOfEmployee = getEmployeeList();
+		employeePayrollRESTService = new EmployeePayrollService(Arrays.asList(arrayOfEmployee));
+		EmployeePayrollData employeePayrollData = employeePayrollRESTService.getEmployeePayrollData("Gayathri");
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		Response response = request.delete("/employeepayroll/" + employeePayrollData.id);
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(200, statusCode);
+
+		employeePayrollRESTService.deleteEmployeePayroll(employeePayrollData.name, REST_IO);
+		long entries = employeePayrollRESTService.countEntries(REST_IO);
+		Assert.assertEquals(4, entries);
 	}
 }
