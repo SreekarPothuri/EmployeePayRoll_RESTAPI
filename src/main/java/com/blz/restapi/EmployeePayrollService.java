@@ -38,4 +38,9 @@ public class EmployeePayrollService {
 				.findFirst().orElse(null);
 		return employeePayrollData;
 	}
+
+	public void deleteEmployeePayroll(String name, IOService ioService) {
+		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+		employeePayrollList.remove(employeePayrollData);
+	}
 }
